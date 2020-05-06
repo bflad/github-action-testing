@@ -23,7 +23,7 @@ jobs:
     - uses: hashicorp/setup-terraform@v1
     - name: terraform
       run: |
-        for DIR in $(find ./examples -type d); do
+        for DIR in $(find ./examples ! -path ./examples -type d); do
           pushd $DIR
           if [ -f terraform.template.tfvars ]; then
             cp terraform.template.tfvars terraform.tfvars
