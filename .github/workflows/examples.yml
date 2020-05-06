@@ -28,9 +28,11 @@ jobs:
           if [ -f terraform.template.tfvars ]; then
             cp terraform.template.tfvars terraform.tfvars
           fi
-          ls -la
-          TF_LOG=TRACE terraform init
+          echo; echo "===> Initializing Example: $DIR <==="; echo
+          terraform init
+          echo; echo "===> Format Checking Example: $DIR <==="; echo
           terraform fmt -check
-          TF_LOG=TRACE terraform validate
+          echo; echo "===> Validating Example: $DIR <==="; echo
+          terraform validate
           popd
         done
