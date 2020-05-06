@@ -24,6 +24,9 @@ jobs:
       run: |
         for DIR in $(find ./examples -type d); do
           pushd $DIR
+          if [ -e terraform.template.tfvars ]; then
+            cp terraform.template.tfvars terraform.tfvars
+          fi
           terraform init
           terraform fmt -check
           terraform validate
