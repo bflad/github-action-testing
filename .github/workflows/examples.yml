@@ -29,7 +29,8 @@ jobs:
             echo "copying"
             cp terraform.template.tfvars terraform.tfvars
           fi
-          terraform init
+          ls -la
+          TF_LOG=TRACE terraform init
           terraform fmt -check
           TF_LOG=TRACE terraform validate
           popd
