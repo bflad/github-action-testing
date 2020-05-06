@@ -31,6 +31,6 @@ jobs:
           fi
           terraform init
           terraform fmt -check
-          terraform validate
+          TF_LOG=TRACE terraform validate
           popd
         done
