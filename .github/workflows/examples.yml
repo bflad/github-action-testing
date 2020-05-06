@@ -8,7 +8,8 @@ on:
       - examples/**
 
 env:
-  TF_PLUGIN_CACHE_DIR: ~/.terraform.d/plugin-cache
+  AWS_DEFAULT_REGION: us-west-2
+  TF_PLUGIN_CACHE_DIR: $HOME/.terraform.d/plugin-cache
 
 jobs:
   terraform:
@@ -24,9 +25,7 @@ jobs:
       run: |
         for DIR in $(find ./examples -type d); do
           pushd $DIR
-          ls -la
           if [ -f terraform.template.tfvars ]; then
-            echo "copying"
             cp terraform.template.tfvars terraform.tfvars
           fi
           ls -la
