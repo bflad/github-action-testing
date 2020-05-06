@@ -1,0 +1,31 @@
+name: Examples Checks
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths:
+      - examples/**
+
+env:
+  TF_PLUGIN_CACHE_DIR: ~/.terraform.d/plugin-cache
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/cache@v1
+      with:
+        key: ${{ runner.os }}-terraform-plugin-cache
+        path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+    - uses: actions/checkout@v2
+    - uses: hashicorp/setup-terraform@v1
+    - name: terraform
+      run: |
+        for DIR in $(find ./examples -type d); do
+          pushd $DIR
+          terraform init
+          terraform fmt -check
+          terraform validate
+          popd
+        done
