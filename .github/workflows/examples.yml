@@ -29,7 +29,7 @@ jobs:
             cp terraform.template.tfvars terraform.tfvars
           fi
           echo; echo -e "\e[1;35m===> Initializing Example: $DIR <===\e[0m"; echo
-          terraform init
+          TF_LOG=TRACE terraform init
           echo; echo -e "\e[1;35m===> Format Checking Example: $DIR <===\e[0m"; echo
           terraform fmt -check
           echo; echo -e "\e[1;35m===> Validating Example: $DIR <===\e[0m"; echo
