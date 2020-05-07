@@ -14,6 +14,10 @@ env:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        terraform_version: ["0.11.14", "0.12.24"]
     steps:
     - uses: actions/cache@v1
       with:
@@ -21,12 +25,16 @@ jobs:
         path: ${{ env.TF_PLUGIN_CACHE_DIR }}
     - uses: actions/checkout@v2
     - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: ${{ matrix.terraform_version }}
     - name: terraform
       run: |
         for DIR in $(find ./examples ! -path ./examples -type d); do
           pushd $DIR
           if [ -f terraform.template.tfvars ]; then
             cp terraform.template.tfvars terraform.tfvars
+          elif [ $DIR = asg ]; then
+            echo "key_name = terraform-aws-provider-ci-testing" > terraform.tfvars
           fi
           echo; echo -e "\e[1;35m===> Initializing Example: $DIR <===\e[0m"; echo
           terraform init
