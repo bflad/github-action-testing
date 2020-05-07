@@ -35,6 +35,7 @@ jobs:
         terraform_version: ${{ matrix.terraform_version }}
     - name: terraform
       run: |
+        ls -la $TF_PLUGIN_CACHE_DIR
         for DIR in $(find ./examples -type f -name '*.tf' -exec dirname {} \; | sort -u); do
           if [ ${{ matrix.terraform_version }} = 0.11.14 ]; then
             if [ $DIR = ./examples/eks-getting-started ]; then
@@ -51,7 +52,7 @@ jobs:
             cp terraform.template.tfvars terraform.tfvars
           fi
           echo; echo -e "\e[1;35m===> Initializing Example: $DIR <===\e[0m"; echo
-          terraform init
+          TF_LOG=TRACE terraform init
           # Prefer Terraform 0.12 and later format checking to prevent conflicts
           if [ ${{ matrix.terraform_version }} != 0.11.14 ]; then
             echo; echo -e "\e[1;35m===> Format Checking Example: $DIR <===\e[0m"; echo
