@@ -38,8 +38,10 @@ jobs:
           fi
           echo; echo -e "\e[1;35m===> Initializing Example: $DIR <===\e[0m"; echo
           terraform init
-          echo; echo -e "\e[1;35m===> Format Checking Example: $DIR <===\e[0m"; echo
-          terraform fmt -check
+          if [ ${{ matrix.terraform_version }} != 0.11.14 ]; then
+            echo; echo -e "\e[1;35m===> Format Checking Example: $DIR <===\e[0m"; echo
+            terraform fmt -check
+          fi
           echo; echo -e "\e[1;35m===> Validating Example: $DIR <===\e[0m"; echo
           terraform validate
           popd
