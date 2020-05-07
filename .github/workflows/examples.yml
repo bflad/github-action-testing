@@ -30,6 +30,12 @@ jobs:
     - name: terraform
       run: |
         for DIR in $(find ./examples -type f -name '*.tf' -exec dirname {} \; | sort -u); do
+          if [ ${{ matrix.terraform_version }} = 0.11.14 ]; then
+            # Skip examples already converted to Terraform 0.12 only syntax
+            if [ $DIR = ./examples/eks-getting-started ]; then
+              continue
+            fi
+          fi
           pushd $DIR
           if [ -f terraform.template.tfvars ]; then
             cp terraform.template.tfvars terraform.tfvars
