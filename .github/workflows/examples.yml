@@ -36,7 +36,7 @@ jobs:
         GOARCH=$(go env GOARCH)
         # For unpinned dependencies, Terraform will use pessimistic match against latest release (e.g. ~> 2.60)
         # VERSION=$(git describe --abbrev=0 --match='v*.*.*' --tags | sed 's/\..*$/.99.99/')
-        VERSION=99.99.99
+        VERSION=v99.99.99
         go build -o ${TF_PLUGIN_CACHE_DIR}/${GOOS}_${GOARCH}/terraform-provider-aws_${VERSION}_x4 .
     - uses: hashicorp/setup-terraform@v1
       with:
