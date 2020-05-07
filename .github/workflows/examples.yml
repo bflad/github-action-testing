@@ -20,6 +20,11 @@ jobs:
         go_version: ["1.14"]
         terraform_version: ["0.11.14", "0.12.24"]
     steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: git fetch tags
+      run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
     - uses: actions/cache@v1
       with:
         path: ~/go/pkg/mod
@@ -28,13 +33,10 @@ jobs:
           ${{ runner.os }}-go-
     - uses: actions/cache@v1
       with:
-        key: ${{ runner.os }}-terraform-plugin-cache
         path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: git fetch tags
-      run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+        key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('aws/**') }}
+        restore-keys: |
+          ${{ runner.os }}-terraform-plugin-cache-
     - uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go_version }}
