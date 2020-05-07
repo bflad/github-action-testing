@@ -1,0 +1,55 @@
+name: Terraform Provider Checks
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths:
+      - aws/**
+      - main.go
+      - website/**
+
+env:
+  AWS_DEFAULT_REGION: us-west-2
+
+jobs:
+  tfproviderdocs:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go_version: ["1.14"]
+        terraform_version: ["0.12.24"]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go_version }}
+    - name: go build
+      run: |
+        GOOS=$(go env GOOS)
+        GOARCH=$(go env GOARCH)
+        go build -o bin/${GOOS}_${GOARCH}/terraform-provider-aws_v99.99.99_x4 .
+    - run: go install github.com/bflad/tfproviderdocs
+    - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: ${{ matrix.terraform_version }}
+    - name: terraform init
+      run: |
+        # We need a file to initialize the provider
+        echo 'data "aws_partition" "example" {}' > example.tf
+        terraform init -plugin-dir bin
+    - run: terraform providers schema -json > schema.json
+    - name: tfproviderdocs check
+      run: |
+        tfproviderdocs check \
+          -allowed-resource-subcategories-file website/allowed-subcategories.txt \
+          -ignore-side-navigation-data-sources aws_alb,aws_alb_listener,aws_alb_target_group,aws_kms_secret \
+          -providers-schema-json schema.json \
+          -require-resource-subcategory
