@@ -31,7 +31,7 @@ jobs:
       run: |
         for DIR in $(find ./examples -type f -name '*.tf' -exec dirname {} \; | sort -u); do
           if [ ${{ matrix.terraform_version }} = 0.11.14 ]; then
-            # Skip examples already converted to Terraform 0.12 only syntax
+            # Skip examples already converted to Terraform 0.12 and later syntax
             if [ $DIR = ./examples/eks-getting-started ]; then
               continue
             fi
