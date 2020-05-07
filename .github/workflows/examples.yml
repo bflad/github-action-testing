@@ -35,14 +35,15 @@ jobs:
         GOOS=$(go env GOOS)
         GOARCH=$(go env GOARCH)
         # For unpinned dependencies, Terraform will use pessimistic match against latest release (e.g. ~> 2.60)
-        VERSION=$(git describe --abbrev=0 --match='v*.*.*' --tags | sed 's/\..*$/.99.99/')
+        # VERSION=$(git describe --abbrev=0 --match='v*.*.*' --tags | sed 's/\..*$/.99.99/')
+        VERSION=99.99.99
         go build -o ${TF_PLUGIN_CACHE_DIR}/${GOOS}_${GOARCH}/terraform-provider-aws_${VERSION}_x4 .
     - uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: ${{ matrix.terraform_version }}
     - name: terraform
       run: |
-        tree $TF_PLUGIN_CACHE_DIR
+        find $TF_PLUGIN_CACHE_DIR
         for DIR in $(find ./examples -type f -name '*.tf' -exec dirname {} \; | sort -u); do
           if [ ${{ matrix.terraform_version }} = 0.11.14 ]; then
             if [ $DIR = ./examples/eks-getting-started ]; then
