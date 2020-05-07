@@ -33,9 +33,7 @@ jobs:
         go-version: ${{ matrix.go_version }}
     - name: go build
       run: |
-        GOOS=$(go env GOOS)
-        GOARCH=$(go env GOARCH)
-        go build -o bin/${GOOS}_${GOARCH}/terraform-provider-aws_v99.99.99_x4 .
+        go build -o bin/terraform-provider-aws_v99.99.99_x4 .
     - run: go install github.com/bflad/tfproviderdocs
     - uses: hashicorp/setup-terraform@v1
       with:
