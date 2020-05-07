@@ -29,9 +29,7 @@ jobs:
       with:
         go-version: ${{ matrix.go_version }}
     - name: go build
-      run: |
-        go build -o terraform-provider-aws_v99.99.99 .
-        cp terraform-provider-aws_v99.99.99 $TF_PLUGIN_CACHE_DIR
+      run: go build -o $TF_PLUGIN_CACHE_DIR/terraform-provider-aws_v99.99.99 .
     - uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: ${{ matrix.terraform_version }}
