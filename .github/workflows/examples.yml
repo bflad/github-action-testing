@@ -31,12 +31,6 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
-    - uses: actions/cache@v1
-      with:
-        path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-        key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('aws/**') }}
-        restore-keys: |
-          ${{ runner.os }}-terraform-plugin-cache-
     - uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go_version }}
