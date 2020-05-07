@@ -1,5 +1,11 @@
 package main
 
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/plugin"
+	"github.com/terraform-providers/terraform-provider-aws/aws"
+)
+
 func main() {
-	// do nothing!
+	plugin.Serve(&plugin.ServeOpts{
+		ProviderFunc: aws.Provider})
 }
