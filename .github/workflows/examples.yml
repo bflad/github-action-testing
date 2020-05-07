@@ -36,6 +36,7 @@ jobs:
               continue
             elif [ $DIR = ./examples/two-tier ]; then
               # 0.11 validation requires file path to exist
+              mkdir -p ~/.ssh
               touch ~/.ssh/terraform-provider-aws-example.pub
             fi
           fi
