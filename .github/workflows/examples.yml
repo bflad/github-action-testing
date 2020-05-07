@@ -22,6 +22,12 @@ jobs:
     steps:
     - uses: actions/cache@v1
       with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - uses: actions/cache@v1
+      with:
         key: ${{ runner.os }}-terraform-plugin-cache
         path: ${{ env.TF_PLUGIN_CACHE_DIR }}
     - uses: actions/checkout@v2
