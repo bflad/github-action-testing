@@ -30,9 +30,8 @@ jobs:
         go-version: ${{ matrix.go_version }}
     - name: go build
       run: |
-        go env -w
         # mkdir -p $TF_PLUGIN_CACHE_DIR/$GOOS_$GOARCH
-        go build -o $TF_PLUGIN_CACHE_DIR/$GOOS_$GOARCH/terraform-provider-aws_v99.99.99 .
+        go build -o $TF_PLUGIN_CACHE_DIR/$(go env GOOS)_$(go env GOARCH)/terraform-provider-aws_v99.99.99 .
     - uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: ${{ matrix.terraform_version }}
