@@ -31,9 +31,12 @@ jobs:
       run: |
         for DIR in $(find ./examples -type f -name '*.tf' -exec dirname {} \; | sort -u); do
           if [ ${{ matrix.terraform_version }} = 0.11.14 ]; then
-            # Skip examples already converted to Terraform 0.12 and later syntax
             if [ $DIR = ./examples/eks-getting-started ]; then
+              # Skip example already converted to Terraform 0.12 and later syntax
               continue
+            elif [ $DIR = ./examples/two-tier ]; then
+              # 0.11 validation requires file path to exist
+              touch ~/.ssh/terraform-provider-aws-example.pub
             fi
           fi
           pushd $DIR
@@ -42,6 +45,7 @@ jobs:
           fi
           echo; echo -e "\e[1;35m===> Initializing Example: $DIR <===\e[0m"; echo
           terraform init
+          # Prefer Terraform 0.12 and later format checking to prevent conflicts
           if [ ${{ matrix.terraform_version }} != 0.11.14 ]; then
             echo; echo -e "\e[1;35m===> Format Checking Example: $DIR <===\e[0m"; echo
             terraform fmt -check
