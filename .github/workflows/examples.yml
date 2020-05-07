@@ -34,7 +34,7 @@ jobs:
           if [ -f terraform.template.tfvars ]; then
             cp terraform.template.tfvars terraform.tfvars
           elif [ $DIR = ./examples/asg ]; then
-            echo "key_name = terraform-aws-provider-ci-testing" > terraform.tfvars
+            echo 'key_name = "terraform-aws-provider-ci-testing"' > terraform.tfvars
           fi
           echo; echo -e "\e[1;35m===> Initializing Example: $DIR <===\e[0m"; echo
           terraform init
