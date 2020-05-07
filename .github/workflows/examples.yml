@@ -32,13 +32,13 @@ jobs:
         go-version: ${{ matrix.go_version }}
     - name: go build
       run: |
-        echo "git tags"
-        git tags
-        echo "git describe tags"
+        echo "git tag -l"
+        git tag -l
+        echo "git describe --tags"
         git describe --tags
-        echo "git describe tags with abbrev"
+        echo "git describe --abbrev=0 --tags"
         git describe --abbrev=0 --tags
-        echo "git describe tags with match"
+        echo "git describe --abbrev=0 --match='v*.*.*' --tags"
         git describe --abbrev=0 --match='v*.*.*' --tags
         GOOS=$(go env GOOS)
         GOARCH=$(go env GOARCH)
