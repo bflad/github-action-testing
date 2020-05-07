@@ -17,6 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        go_version: ["1.14"]
         terraform_version: ["0.11.14", "0.12.24"]
     steps:
     - uses: actions/cache@v1
@@ -24,6 +25,13 @@ jobs:
         key: ${{ runner.os }}-terraform-plugin-cache
         path: ${{ env.TF_PLUGIN_CACHE_DIR }}
     - uses: actions/checkout@v2
+    - uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go_version }}
+    - name: go build
+      run: |
+        go build -o terraform-provider-aws_v99.99.99 .
+        cp terraform-provider-aws_v99.99.99 $TF_PLUGIN_CACHE_DIR
     - uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: ${{ matrix.terraform_version }}
