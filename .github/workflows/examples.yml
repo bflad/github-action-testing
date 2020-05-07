@@ -25,6 +25,8 @@ jobs:
         key: ${{ runner.os }}-terraform-plugin-cache
         path: ${{ env.TF_PLUGIN_CACHE_DIR }}
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: git fetch tags
       run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
     - uses: actions/setup-go@v1
