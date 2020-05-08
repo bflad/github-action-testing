@@ -47,9 +47,9 @@ jobs:
     - run: terraform providers schema -json > schema.json
     - name: tfproviderdocs check
       run: |
-        cat schema.json
         tfproviderdocs check \
           -allowed-resource-subcategories-file website/allowed-subcategories.txt \
           -ignore-side-navigation-data-sources aws_alb,aws_alb_listener,aws_alb_target_group,aws_kms_secret \
+          -provider-name aws \
           -providers-schema-json schema.json \
           -require-resource-subcategory
