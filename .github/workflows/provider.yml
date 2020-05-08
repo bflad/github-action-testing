@@ -33,7 +33,7 @@ jobs:
       id: cache-go-pkg-mod
       with:
         path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
     - if: steps.cache-go-pkg-mod.outputs.cache-hit != 'true'
       run: go mod download
   make_tools:
@@ -52,12 +52,12 @@ jobs:
       id: cache-tools
       with:
         path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('**/go.sum') }}-${{ hashFiles('awsproviderlint/**') }}
+        key: ${{ runner.os }}-tools-${{ hashFiles('go.sum') }}-${{ hashFiles('awsproviderlint/**/*') }}
     - if: steps.cache-tools.outputs.cache-hit != 'true'
       uses: actions/cache@v1
       with:
         path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
     - if: steps.cache-tools.outputs.cache-hit != 'true'
       env:
         GOBIN: ${{ github.workspace }}/tools
@@ -72,7 +72,7 @@ jobs:
       id: cache-terraform-plugin-dir
       with:
         path: terraform-plugin-dir
-        key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('**/go.sum') }}-${{ hashFiles('aws/**') }}
+        key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**/*') }}
     - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
       uses: actions/setup-go@v2
       with:
@@ -81,7 +81,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
     - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
       name: go build
       run: go build -o terraform-plugin-dir/terraform-provider-aws_v99.99.99_x4 .
@@ -95,12 +95,12 @@ jobs:
       id: cache-terraform-providers-schema
       with:
         path: terraform-providers-schema
-        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('**/go.sum') }}-${{ hashFiles('aws/**') }}
+        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**/*') }}
     - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
       uses: actions/cache@v1
       with:
         path: terraform-plugin-dir
-        key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('**/go.sum') }}-${{ hashFiles('aws/**') }}
+        key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**/*') }}
     - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
       uses: hashicorp/setup-terraform@v1
       with:
@@ -125,11 +125,11 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: terraform-providers-schema
-        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('**/go.sum') }}-${{ hashFiles('aws/**') }}
+        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**/*') }}
     - uses: actions/cache@v1
       with:
         path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('**/go.sum') }}-${{ hashFiles('awsproviderlint/**') }}
+        key: ${{ runner.os }}-tools-${{ hashFiles('go.sum') }}-${{ hashFiles('awsproviderlint/**/*') }}
     - run: echo "::add-path::tools"
     - name: tfproviderdocs check
       run: |
