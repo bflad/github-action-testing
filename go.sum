@@ -32,8 +32,8 @@ github.com/aws/aws-sdk-go v1.30.21 h1:19EO1Jr80+jLwJyITzH8c79C/6EwY5mMyasqDbBiCu
 github.com/aws/aws-sdk-go v1.30.21/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/beevik/etree v1.1.0 h1:T0xke/WvNtMoCqgzPhkX2r4rjY3GDZFi+FjpRZY2Jbs=
 github.com/beevik/etree v1.1.0/go.mod h1:r8Aw8JqVegEf0w2fDnATrX9VpkMcyFeM0FhwO62wh+A=
-github.com/bflad/tfproviderdocs v0.5.4-0.20200508050741-1fecab62daa0 h1:oHdPEtaYFyXeM+0Zvv/7hfCYRjGFBTJTuhm6mkzcKtI=
-github.com/bflad/tfproviderdocs v0.5.4-0.20200508050741-1fecab62daa0/go.mod h1:W6wVZPtBa6V5bpjaK1eJAoVCL/7B4Amfrld0dro+fHU=
+github.com/bflad/tfproviderdocs v0.5.4-0.20200508052119-a8f91d22164f h1:aEnU1zYgqNA8p6d3hxZrwtki4w62NhHrtoaHoe7ApGg=
+github.com/bflad/tfproviderdocs v0.5.4-0.20200508052119-a8f91d22164f/go.mod h1:W6wVZPtBa6V5bpjaK1eJAoVCL/7B4Amfrld0dro+fHU=
 github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d h1:xDfNPAt8lFiC1UJrqV3uuy861HCTo708pDMbjHHdCas=
 github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d/go.mod h1:6QX/PXZ00z/TKoufEY6K/a0k6AhaJrQKdFe6OfVXsa4=
 github.com/bgentry/speakeasy v0.1.0 h1:ByYyxL9InA1OWqxJqqp2A5pYHUrCiAL6K3J+LKSsQkY=

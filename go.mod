@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/aws/aws-sdk-go v1.30.21
 	github.com/beevik/etree v1.1.0
-	github.com/bflad/tfproviderdocs v0.5.4-0.20200508050741-1fecab62daa0
+	github.com/bflad/tfproviderdocs v0.5.4-0.20200508052119-a8f91d22164f
 	github.com/hashicorp/aws-sdk-go-base v0.4.0
 	github.com/hashicorp/go-cleanhttp v0.5.1
 	github.com/hashicorp/go-multierror v1.0.0
