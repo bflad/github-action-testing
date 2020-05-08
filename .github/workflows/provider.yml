@@ -55,7 +55,7 @@ jobs:
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('**/go.sum') }}
     - if: steps.cache-tools.outputs.cache-hit != 'true'
       env:
-        GOBIN: tools
+        GOBIN: ${{ github.workspace }}/tools
       run: make tools
   go_build:
     name: go build
