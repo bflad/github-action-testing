@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - aws/**
+      - awsproviderlint/**
       - docs/index.md
       - docs/data-sources/**
       - docs/guides/**
@@ -36,7 +37,7 @@ jobs:
     - if: steps.cache-go-pkg-mod.outputs.cache-hit != 'true'
       run: go mod download
   make_tools:
-    name: go install tools
+    name: make tools
     needs: [go_mod_download]
     runs-on: ubuntu-latest
     steps:
