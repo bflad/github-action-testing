@@ -11,15 +11,12 @@ on:
 
 env:
   AWS_DEFAULT_REGION: us-west-2
+  GO_VERSION: "1.14"
+  TERRAFORM_VERSION: "0.12.24"
 
 jobs:
-  tfproviderdocs:
+  go_build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        go_version: ["1.14"]
-        terraform_version: ["0.12.24"]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v1
@@ -30,14 +27,17 @@ jobs:
           ${{ runner.os }}-go-
     - uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.go_version }}
+        go-version: ${{ env.GO_VERSION }}
     - name: go build
       run: |
         go build -o bin/terraform-provider-aws_v99.99.99_x4 .
-    - run: go install github.com/bflad/tfproviderdocs
+  terraform_providers_schema:
+    needs: [go_build]
+    runs-on: ubuntu-latest
+    steps:
     - uses: hashicorp/setup-terraform@v1
       with:
-        terraform_version: ${{ matrix.terraform_version }}
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
         terraform_wrapper: false
     - name: terraform init
       run: |
@@ -45,6 +45,21 @@ jobs:
         echo 'data "aws_partition" "example" {}' > example.tf
         terraform init -plugin-dir bin
     - run: terraform providers schema -json > schema.json
+  tfproviderdocs:
+    needs: [terraform_providers_schema]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - run: go install github.com/bflad/tfproviderdocs
     - name: tfproviderdocs check
       run: |
         tfproviderdocs check \
