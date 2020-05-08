@@ -5,6 +5,7 @@ on:
       - master
   pull_request:
     paths:
+      - .golangci.yml
       - aws/**
       - awsproviderlint/**
       - docs/index.md
@@ -13,6 +14,7 @@ on:
       - docs/resources/**
       - go.sum
       - main.go
+      - staticcheck.conf
       - website/**
 
 env:
