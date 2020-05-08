@@ -6,6 +6,10 @@ on:
   pull_request:
     paths:
       - aws/**
+      - docs/index.md
+      - docs/data-sources/**
+      - docs/guides/**
+      - docs/resources/**
       - main.go
       - website/**
 
@@ -16,22 +20,30 @@ env:
 
 jobs:
   go_build:
+    name: go build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/cache@v1
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
     - uses: actions/setup-go@v2
       with:
         go-version: ${{ env.GO_VERSION }}
-    - name: go build
+    - name: go env
       run: |
-        go build -o bin/terraform-provider-aws_v99.99.99_x4 .
+        echo "::set-env name=GOCACHE::$(go env GOCACHE)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ env.GOCACHE }}
+        key: ${{ runner.os }}-gocache-${{ hashFiles('aws/**') }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-pkg-mod-
+    - name: go build
+      run: go build -o bin/terraform-provider-aws_v99.99.99_x4 .
   terraform_providers_schema:
+    name: terraform providers schema
     needs: [go_build]
     runs-on: ubuntu-latest
     steps:
