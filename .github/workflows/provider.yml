@@ -43,9 +43,11 @@ jobs:
         # We need a file to initialize the provider
         echo 'data "aws_partition" "example" {}' > example.tf
         terraform init -plugin-dir bin
+    - run: terraform providers schema -json
     - run: terraform providers schema -json > schema.json
     - name: tfproviderdocs check
       run: |
+        cat schema.json
         tfproviderdocs check \
           -allowed-resource-subcategories-file website/allowed-subcategories.txt \
           -ignore-side-navigation-data-sources aws_alb,aws_alb_listener,aws_alb_target_group,aws_kms_secret \
