@@ -51,6 +51,14 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: ${{ env.GO_VERSION }}
+    - name: go env
+      run: |
+        echo "::set-env name=GOCACHE::$(go env GOCACHE)"
+    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
+      uses: actions/cache@v1
+      with:
+        path: ${{ env.GOCACHE }}
+        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
       uses: actions/cache@v1
       with:
@@ -91,6 +99,149 @@ jobs:
       run: |
         mkdir terraform-providers-schema
         terraform providers schema -json > terraform-providers-schema/schema.json
+  awsproviderlint:
+    needs: [go_build, go_mod_download]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: go env
+      run: |
+        echo "::set-env name=GOCACHE::$(go env GOCACHE)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ env.GOCACHE }}
+        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
+    - run: go install ./awsproviderlint
+    - name: awsproviderlint
+      run: |
+        awsproviderlint \
+          -c 1 \
+          -AT001 \
+          -AT002 \
+          -AT005 \
+          -AT006 \
+          -AT007 \
+          -AT008 \
+          -AWSR001 \
+          -AWSR002 \
+          -R002 \
+          -R003 \
+          -R004 \
+          -R006 \
+          -R007 \
+          -R008 \
+          -R009 \
+          -R012 \
+          -R013 \
+          -R014 \
+          -S001 \
+          -S002 \
+          -S003 \
+          -S004 \
+          -S005 \
+          -S007 \
+          -S008 \
+          -S009 \
+          -S010 \
+          -S011 \
+          -S012 \
+          -S013 \
+          -S014 \
+          -S015 \
+          -S016 \
+          -S017 \
+          -S019 \
+          -S020 \
+          -S021 \
+          -S022 \
+          -S023 \
+          -S024 \
+          -S025 \
+          -S026 \
+          -S027 \
+          -S028 \
+          -S029 \
+          -S030 \
+          -S031 \
+          -S032 \
+          -S033 \
+          -S034 \
+          -S035 \
+          -S036 \
+          -S037 \
+          -V002 \
+          -V003 \
+          -V004 \
+          -V005 \
+          -V006 \
+          -V007 \
+          -V008 \
+          ./aws
+  golangci-lint:
+    needs: [go_build, go_mod_download]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: go env
+      run: |
+        echo "::set-env name=GOCACHE::$(go env GOCACHE)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ env.GOCACHE }}
+        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
+    - run: go install github.com/golangci/golangci-lint/cmd/golangci-lint
+    - run: golangci-lint run ./aws/...
+  go_generate:
+    name: go generate
+    needs: [go_build]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: go env
+      run: |
+        echo "::set-env name=GOCACHE::$(go env GOCACHE)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ env.GOCACHE }}
+        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
+    - run: go generate ./...
+    - name: Check for Git Differences
+      run: git diff --compact-summary --exit-code || \
+        (echo; echo "Unexpected difference in directories after code generation. Run 'make gen' command and commit."; exit 1)
+  go_test:
+    name: go test
+    needs: [go_build]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: go env
+      run: |
+        echo "::set-env name=GOCACHE::$(go env GOCACHE)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ env.GOCACHE }}
+        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
+    - run: go test ./... -timeout=120s
   tfproviderdocs:
     needs: [go_mod_download, terraform_providers_schema]
     runs-on: ubuntu-latest
