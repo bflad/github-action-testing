@@ -36,32 +36,6 @@ jobs:
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
     - if: steps.cache-go-pkg-mod.outputs.cache-hit != 'true'
       run: go mod download
-  make_tools:
-    name: make tools
-    needs: [go_mod_download]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - run: |
-        ls -la
-        ls -la awsproviderlint
-    - uses: actions/cache@v1
-      id: cache-tools
-      with:
-        path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('go.sum') }}-${{ hashFiles('awsproviderlint/**/*') }}
-    - if: steps.cache-tools.outputs.cache-hit != 'true'
-      uses: actions/cache@v1
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
-    - if: steps.cache-tools.outputs.cache-hit != 'true'
-      env:
-        GOBIN: ${{ github.workspace }}/tools
-      run: make tools
   go_build:
     name: go build
     needs: [go_mod_download]
@@ -72,7 +46,7 @@ jobs:
       id: cache-terraform-plugin-dir
       with:
         path: terraform-plugin-dir
-        key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**/*') }}
+        key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
       uses: actions/setup-go@v2
       with:
@@ -95,12 +69,12 @@ jobs:
       id: cache-terraform-providers-schema
       with:
         path: terraform-providers-schema
-        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**/*') }}
+        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
       uses: actions/cache@v1
       with:
         path: terraform-plugin-dir
-        key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**/*') }}
+        key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
       uses: hashicorp/setup-terraform@v1
       with:
@@ -118,19 +92,22 @@ jobs:
         mkdir terraform-providers-schema
         terraform providers schema -json > terraform-providers-schema/schema.json
   tfproviderdocs:
-    needs: [make_tools, terraform_providers_schema]
+    needs: [terraform_providers_schema]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
+    - run: go install github.com/bflad/tfproviderdocs
     - uses: actions/cache@v1
       with:
         path: terraform-providers-schema
-        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**/*') }}
-    - uses: actions/cache@v1
-      with:
-        path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('go.sum') }}-${{ hashFiles('awsproviderlint/**/*') }}
-    - run: echo "::add-path::tools"
+        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - name: tfproviderdocs check
       run: |
         tfproviderdocs check \
