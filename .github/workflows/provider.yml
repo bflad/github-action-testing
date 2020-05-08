@@ -20,7 +20,7 @@ env:
 
 jobs:
   go_mod_download:
-    name: go build
+    name: go mod download
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
