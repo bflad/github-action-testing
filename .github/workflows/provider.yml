@@ -10,6 +10,7 @@ on:
       - docs/data-sources/**
       - docs/guides/**
       - docs/resources/**
+      - go.sum
       - main.go
       - website/**
 
