@@ -92,7 +92,7 @@ jobs:
         mkdir terraform-providers-schema
         terraform providers schema -json > terraform-providers-schema/schema.json
   tfproviderdocs:
-    needs: [terraform_providers_schema]
+    needs: [go_mod_download, terraform_providers_schema]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
