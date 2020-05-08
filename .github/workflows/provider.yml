@@ -29,7 +29,7 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
     - name: go env
       run: |
-        echo "::set-env name=GOBIN::$(go env GOBIN)"
+        echo "::set-env name=GOBIN::$(go env GOPATH)/bin"
         echo "::set-env name=GOCACHE::$(go env GOCACHE)"
     - uses: actions/cache@v1
       with:
@@ -41,8 +41,9 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ${{ env.GOCACHE }}
-        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('aws/**') }}
+        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('**/go.sum') }}-${{ hashFiles('aws/**') }}
         restore-keys: |
+          ${{ runner.os }}-GOCACHE-${{ hashFiles('**/go.sum') }}-
           ${{ runner.os }}-GOCACHE-
     - uses: actions/cache@v1
       with:
@@ -65,37 +66,43 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-GOBIN-${{ hashFiles('**/go.sum') }}-
           ${{ runner.os }}-GOBIN-
+    - uses: actions/cache@v1
+      id: cache-terraform-providers-schema
+      with:
+        path: terraform-providers-schema
+        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('**/go.sum') }}-${{ hashFiles('aws/**') }}
     - uses: hashicorp/setup-terraform@v1
+      if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
       with:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
         terraform_wrapper: false
     - name: terraform init
+      if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
       run: |
         # We need a file to initialize the provider
         echo 'data "aws_partition" "example" {}' > example.tf
         terraform init -plugin-dir bin
-    - run: terraform providers schema -json > schema.json
+    - name: terraform providers schema
+      if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
+      run: terraform providers schema -json > terraform-providers-schema/schema.json
   tfproviderdocs:
     needs: [terraform_providers_schema]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/cache@v1
+    - uses: actions/setup-go@v2
       with:
-        path: ${{ env.GOBIN }}
-        key: ${{ runner.os }}-GOBIN-${{ hashFiles('**/go.sum') }}-${{ hashFiles('aws/**') }}
-        restore-keys: |
-          ${{ runner.os }}-GOBIN-${{ hashFiles('**/go.sum') }}-
-          ${{ runner.os }}-GOBIN-
+        go-version: ${{ env.GO_VERSION }}
     - uses: actions/cache@v1
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-pkg-mod-
-    - uses: actions/setup-go@v2
+    - uses: actions/cache@v1
       with:
-        go-version: ${{ env.GO_VERSION }}
+        path: terraform-providers-schema
+        key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('**/go.sum') }}-${{ hashFiles('aws/**') }}
     - run: go install github.com/bflad/tfproviderdocs
     - name: tfproviderdocs check
       run: |
