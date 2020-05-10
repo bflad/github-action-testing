@@ -13,6 +13,7 @@ on:
       - docs/guides/**
       - docs/resources/**
       - go.sum
+      - GNUmakefile
       - main.go
       - staticcheck.conf
       - website/**
@@ -124,91 +125,7 @@ jobs:
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
     - run: go install ./awsproviderlint
     - name: awsproviderlint
-      run: |
-        awsproviderlint \
-          -c 1 \
-          -AT001 \
-          -AT002 \
-          -AT005 \
-          -AT006 \
-          -AT007 \
-          -AT008 \
-          -AWSR001 \
-          -AWSR002 \
-          -R002 \
-          -R003 \
-          -R004 \
-          -R006 \
-          -R007 \
-          -R008 \
-          -R009 \
-          -R012 \
-          -R013 \
-          -R014 \
-          -S001 \
-          -S002 \
-          -S003 \
-          -S004 \
-          -S005 \
-          -S007 \
-          -S008 \
-          -S009 \
-          -S010 \
-          -S011 \
-          -S012 \
-          -S013 \
-          -S014 \
-          -S015 \
-          -S016 \
-          -S017 \
-          -S019 \
-          -S020 \
-          -S021 \
-          -S022 \
-          -S023 \
-          -S024 \
-          -S025 \
-          -S026 \
-          -S027 \
-          -S028 \
-          -S029 \
-          -S030 \
-          -S031 \
-          -S032 \
-          -S033 \
-          -S034 \
-          -S035 \
-          -S036 \
-          -S037 \
-          -V002 \
-          -V003 \
-          -V004 \
-          -V005 \
-          -V006 \
-          -V007 \
-          -V008 \
-          ./aws
-  golangci-lint:
-    needs: [go_build, go_mod_download]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - name: go env
-      run: |
-        echo "::set-env name=GOCACHE::$(go env GOCACHE)"
-    - uses: actions/cache@v1
-      with:
-        path: ${{ env.GOCACHE }}
-        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
-    - uses: actions/cache@v1
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
-    - run: go install github.com/golangci/golangci-lint/cmd/golangci-lint
-    - run: golangci-lint run ./aws/...
+      run: make awsproviderlint
   go_generate:
     name: go generate
     needs: [go_build]
@@ -255,6 +172,27 @@ jobs:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
     - run: go test ./... -timeout=120s
+  golangci-lint:
+    needs: [go_build, go_mod_download]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: go env
+      run: |
+        echo "::set-env name=GOCACHE::$(go env GOCACHE)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ env.GOCACHE }}
+        key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
+    - run: go install github.com/golangci/golangci-lint/cmd/golangci-lint
+    - run: golangci-lint run ./aws/...
   tfproviderdocs:
     needs: [go_mod_download, terraform_providers_schema]
     runs-on: ubuntu-latest
@@ -276,6 +214,9 @@ jobs:
       run: |
         tfproviderdocs check \
           -allowed-resource-subcategories-file website/allowed-subcategories.txt \
+          -ignore-file-mismatch-resources aws_s3_bucket_analysis_configuration \
+          -ignore-file-missing-data-sources aws_alb,aws_alb_listener,aws_alb_target_group \
+          -ignore-file-missing-resources aws_alb,aws_alb_listener,aws_alb_listener_certificate,aws_alb_listener_rule,aws_alb_target_group,aws_alb_target_group_attachment,aws_s3_bucket_analytics_configuration \
           -ignore-side-navigation-data-sources aws_alb,aws_alb_listener,aws_alb_target_group,aws_kms_secret \
           -provider-name aws \
           -providers-schema-json terraform-providers-schema/schema.json \
