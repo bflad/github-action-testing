@@ -113,7 +113,7 @@ jobs:
         mkdir terraform-providers-schema
         terraform providers schema -json > terraform-providers-schema/schema.json
   awsproviderlint:
-    needs: [go_build, go_mod_download]
+    needs: [go_build]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -193,7 +193,7 @@ jobs:
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
     - run: go test ./... -timeout=120s
   golangci-lint:
-    needs: [go_build, go_mod_download]
+    needs: [go_build]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -218,7 +218,7 @@ jobs:
     - run: go install github.com/golangci/golangci-lint/cmd/golangci-lint
     - run: golangci-lint run ./aws/...
   tfproviderdocs:
-    needs: [go_mod_download, terraform_providers_schema]
+    needs: [terraform_providers_schema]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
