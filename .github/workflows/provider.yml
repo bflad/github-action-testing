@@ -35,11 +35,13 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
     - uses: actions/cache@v1
+      continue-on-error: true
       id: cache-go-pkg-mod
+      timeout-minutes: 2
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
-    - if: steps.cache-go-pkg-mod.outputs.cache-hit != 'true'
+    - if: steps.cache-go-pkg-mod.outputs.cache-hit != 'true' || steps.cache-go-pkg-mod.outcome == 'failure'
       run: go mod download
   go_build:
     name: go build
@@ -48,29 +50,31 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v1
+      continue-on-error: true
       id: cache-terraform-plugin-dir
+      timeout-minutes: 2
       with:
         path: terraform-plugin-dir
         key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
-    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true' || steps.cache-terraform-plugin-dir.outcome == 'failure'
       uses: actions/setup-go@v2
       with:
         go-version: ${{ env.GO_VERSION }}
-    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true' || steps.cache-terraform-plugin-dir.outcome == 'failure'
       name: go env
       run: |
         echo "::set-env name=GOCACHE::$(go env GOCACHE)"
-    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true' || steps.cache-terraform-plugin-dir.outcome == 'failure'
       uses: actions/cache@v1
       with:
         path: ${{ env.GOCACHE }}
         key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
-    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true' || steps.cache-terraform-plugin-dir.outcome == 'failure'
       uses: actions/cache@v1
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
-    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-plugin-dir.outputs.cache-hit != 'true' || steps.cache-terraform-plugin-dir.outcome == 'failure'
       name: go build
       run: go build -o terraform-plugin-dir/terraform-provider-aws_v99.99.99_x4 .
   terraform_providers_schema:
@@ -80,27 +84,30 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v1
+      continue-on-error: true
       id: cache-terraform-providers-schema
+      timeout-minutes: 2
       with:
         path: terraform-providers-schema
         key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
-    - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true' || steps.cache-terraform-providers-schema.outcome == 'failure'
       uses: actions/cache@v1
+      timeout-minutes: 2
       with:
         path: terraform-plugin-dir
         key: ${{ runner.os }}-terraform-plugin-dir-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
-    - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true' || steps.cache-terraform-providers-schema.outcome == 'failure'
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
         terraform_wrapper: false
-    - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true' || steps.cache-terraform-providers-schema.outcome == 'failure'
       name: terraform init
       run: |
         # We need a file to initialize the provider
         echo 'data "aws_partition" "example" {}' > example.tf
         terraform init -plugin-dir terraform-plugin-dir
-    - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true'
+    - if: steps.cache-terraform-providers-schema.outputs.cache-hit != 'true' || steps.cache-terraform-providers-schema.outcome == 'failure'
       name: terraform providers schema
       run: |
         mkdir terraform-providers-schema
@@ -117,10 +124,14 @@ jobs:
       run: |
         echo "::set-env name=GOCACHE::$(go env GOCACHE)"
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ${{ env.GOCACHE }}
         key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
@@ -140,10 +151,14 @@ jobs:
       run: |
         echo "::set-env name=GOCACHE::$(go env GOCACHE)"
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ${{ env.GOCACHE }}
         key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
@@ -165,10 +180,14 @@ jobs:
       run: |
         echo "::set-env name=GOCACHE::$(go env GOCACHE)"
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ${{ env.GOCACHE }}
         key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
@@ -185,10 +204,14 @@ jobs:
       run: |
         echo "::set-env name=GOCACHE::$(go env GOCACHE)"
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ${{ env.GOCACHE }}
         key: ${{ runner.os }}-GOCACHE-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
@@ -203,11 +226,14 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
     - uses: actions/cache@v1
+      continue-on-error: true
+      timeout-minutes: 2
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-pkg-mod-${{ hashFiles('go.sum') }}
     - run: go install github.com/bflad/tfproviderdocs
     - uses: actions/cache@v1
+      timeout-minutes: 2
       with:
         path: terraform-providers-schema
         key: ${{ runner.os }}-terraform-providers-schema-${{ hashFiles('go.sum') }}-${{ hashFiles('aws/**') }}
